@@ -3,7 +3,7 @@ cask "tuitui" do
   name "tuitui"
   desc "Terminal user interface for Jujutsu (jj) version control"
   homepage "https://github.com/frederickbeaulieu/tuitui"
-  version "0.1.2"
+  version "0.1.3"
 
   livecheck do
     skip "Auto-generated on release."
@@ -18,22 +18,22 @@ cask "tuitui" do
   on_macos do
     on_intel do
       url "https://github.com/frederickbeaulieu/tuitui/releases/download/v#{version}/tuitui_#{version}_Darwin_x86_64.tar.gz"
-      sha256 "9e3732c52ce52bcf02e3b0886e12a930043fda1b0db04bce2b9418d4bf302d81"
+      sha256 "b84112225edf1d9b13f3ee2993b58c4f856e36ea6baa181ac36efb517e12d8db"
     end
     on_arm do
       url "https://github.com/frederickbeaulieu/tuitui/releases/download/v#{version}/tuitui_#{version}_Darwin_arm64.tar.gz"
-      sha256 "0a5de059a81458e667a5712a7d96e59a0119b98c869314f861d6fe810bda8159"
+      sha256 "8b7e6b1bce6b00d8fd45ecaefed5474e135aa50b7ec46e00836d5d439a7da4fa"
     end
   end
 
   on_linux do
     on_intel do
       url "https://github.com/frederickbeaulieu/tuitui/releases/download/v#{version}/tuitui_#{version}_Linux_x86_64.tar.gz"
-      sha256 "5794d6e1a524c3a3a14868909c920f13e4325231015d0e1197b3d6515789f23b"
+      sha256 "11c22a581e7d400527e590c0c8afee331c5bcc15c4cab20fe227f3523f9b566d"
     end
     on_arm do
       url "https://github.com/frederickbeaulieu/tuitui/releases/download/v#{version}/tuitui_#{version}_Linux_arm64.tar.gz"
-      sha256 "18588c8fe1e54999b1bb689c0eba65a58af5e6c43a24604bc76e8ce44d2d9720"
+      sha256 "93b5aa784a450fb56ab7b2289176f8f6e9079eefbad5b8451eb39734caf47c59"
     end
   end
 
