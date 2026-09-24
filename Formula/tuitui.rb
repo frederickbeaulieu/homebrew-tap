@@ -1,8 +1,8 @@
 class Tuitui < Formula
   desc "Terminal user interface for Jujutsu (jj) version control"
   homepage "https://github.com/frederickbeaulieu/tuitui"
-  url "https://github.com/frederickbeaulieu/tuitui/archive/refs/tags/v0.10.0.tar.gz"
-  sha256 "301916a07d4b7d32e0ab3d35234bc80f47efdaae69eb4d670f1606b228e7f600"
+  url "https://github.com/frederickbeaulieu/tuitui/archive/refs/tags/v0.10.1.tar.gz"
+  sha256 "86050af5fe0c412d939839d1cce2ce4b96c91bf6d97080f7c5d2a202c7d68cd4"
   license "MIT"
   head "https://github.com/frederickbeaulieu/tuitui.git", branch: "main"
 
