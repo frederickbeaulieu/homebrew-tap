@@ -1,0 +1,91 @@
+name: Bump tuitui formula
+
+# Runs when tuitui publishes a release (repository_dispatch sent by its
+# release workflow) or by hand. Updates the formula to the tag, builds it
+# from source, runs its test and audit, and pushes only when all of that
+# passes.
+on:
+  repository_dispatch:
+    types: [tuitui-release]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "tuitui release tag, e.g. v0.10.0"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    runs-on: macos-latest
+    env:
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
+      HOMEBREW_NO_ENV_HINTS: 1
+    steps:
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cache Homebrew Bundler RubyGems
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.set-up-homebrew.outputs.gems-path }}
+          key: macos-latest-rubygems-${{ steps.set-up-homebrew.outputs.gems-hash }}
+          restore-keys: macos-latest-rubygems-
+
+      - name: Resolve tag
+        id: tag
+        env:
+          TAG: ${{ github.event.inputs.tag || github.event.client_payload.tag }}
+        run: |
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::expected a tag like v1.2.3, got '$TAG'"
+            exit 1
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Update formula
+        shell: bash
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          url="https://github.com/frederickbeaulieu/tuitui/archive/refs/tags/${TAG}.tar.gz"
+          sha="$(curl -fsSL "$url" | shasum -a 256 | cut -d' ' -f1)"
+          sed -i '' -E \
+            -e "s|^(  url \").*(\")$|\1${url}\2|" \
+            -e "s|^(  sha256 \").*(\")$|\1${sha}\2|" \
+            Formula/tuitui.rb
+          git --no-pager diff -- Formula/tuitui.rb
+
+      - name: Build from source, test and audit
+        env:
+          FORMULA: ${{ steps.set-up-homebrew.outputs.tap-name }}/tuitui
+        run: |
+          brew install --build-from-source --verbose "$FORMULA"
+          brew test "$FORMULA"
+          brew audit --strict "$FORMULA"
+
+      - name: Set up git
+        uses: Homebrew/actions/git-user-config@main
+
+      - name: Commit
+        id: commit
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          if git diff --quiet -- Formula/tuitui.rb; then
+            echo "formula already at $TAG, nothing to commit"
+            exit 0
+          fi
+          git commit -m "tuitui ${TAG#v}" -- Formula/tuitui.rb
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Push
+        if: steps.commit.outputs.pushed == 'true'
+        uses: Homebrew/actions/git-try-push@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
